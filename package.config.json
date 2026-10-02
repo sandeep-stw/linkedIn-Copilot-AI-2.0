@@ -1,7 +1,7 @@
 {
   "name": "linkedin-copilot",
   "displayName": "LinkedIn AI Copilot",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "AI-first LinkedIn career & sales copilot: builds options from your Upwork profile, résumé PDF and LinkedIn profile, then prepares daily, weekly and monthly actions you complete in LinkedIn (policy-safe, browser-assisted).",
   "author": {
     "name": "STW Services"

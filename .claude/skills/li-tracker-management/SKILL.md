@@ -30,7 +30,18 @@ Every record needs `provenance` (`ai`, `user`, `user_supplied`, `scheduler`, or 
  "estMinutes":3,"status":"prepared","dueDate":"2026-10-03","relatedIds":["p_0004","i_0009"],
  "dedupeKey":"connection_note:p_0004","linkedinUrl":"https://www.linkedin.com/in/...","draft":"..."}
 ```
-Priority 1 = highest. Status flow: pending → prepared → awaiting_user → completed | skipped;
+Priority 1 = highest. Use this table so the daily plan (time-boxed to `minutes_per_day`) always
+picks the most valuable actions first:
+
+| Priority | Daily actions |
+| --- | --- |
+| 1 | Replies to answer, interview prep for a scheduled interview, deal next step due today |
+| 2 | Due follow-ups, applying to a shortlisted job, touches for **hot** contacts |
+| 3 | Touches for **warm** contacts, "not now" revisits that came due, new connection notes |
+| 4 | Touches for **cold** contacts, today's job search links, publishing a post |
+| 5 | Profile edits, research, collect-context tasks |
+
+Status flow: pending → prepared → awaiting_user → completed | skipped;
 plus paused, blocked (`blockedReason`), cancelled.
 
 ## Confirming user actions ("done t_0012", "I sent it", "posted")

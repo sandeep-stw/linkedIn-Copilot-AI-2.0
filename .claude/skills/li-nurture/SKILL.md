@@ -35,6 +35,7 @@ actually happened. Status changes go through `store.py` only.
 ## Daily (from `status`)
 1. **`nurtureDue`**: for each person (cap within `max_tasks_per_session` overall), draft ONE useful
    touch and create a task `type: nurture_touch`, `dedupeKey: nurture:<prospectId>:<nextTouchDue>`.
+   Priority by warmth: hot 2, warm 3, cold 4 (revisits 3); `estMinutes` 2–3.
    The touch must give something. Choose by what is genuinely available:
    - a substantive comment on their recent post (only if the student pasted or saw it);
    - congratulations on real news (new role, launch, anniversary) that the student mentioned;

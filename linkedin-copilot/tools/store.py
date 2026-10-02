@@ -805,6 +805,8 @@ def compute_status(minutes=None):
         "staleResearch": stale,
         "tasksNeedingFeaturePause": paused_by_feature,
         "pausedTasksToReassess": reassess,
+        "dailyRunToday": any(r["job"] == "li-daily" and r["runKey"] == today.isoformat()
+                             and r["status"] == "succeeded" for r in runs),
         "lastSuccessfulRun": last_ok and {k: last_ok[k] for k in ("job", "runKey", "finishedAt") if k in last_ok},
         "recentFailures": [{k: r.get(k) for k in ("job", "runKey", "note")} for r in failures],
         "preferenceIssues": pref_issues + ([tz_note] if tz_note else []),

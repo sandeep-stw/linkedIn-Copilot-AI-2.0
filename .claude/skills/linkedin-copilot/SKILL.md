@@ -59,10 +59,14 @@ them in this session. Each also runs standalone as `/li-<name>`.
 5. Offer the schedule (§6) if not already set up. End with the first next action.
 
 ## 3. Daily (≈ minutes_per_day)
-1. From `status`: handle `followups` (li-follow-up-management), `pausedTasksToReassess`,
-   `pendingDecisions`, `staleResearch` that blocks today's work.
-2. Top up work only if the queue is thin: drafts (li-content-research), shortlist
-   (li-prospect-research), next actions (li-relationship-guidance). Respect feature switches.
+1. **Make sure today's daily actions exist.** If `status.dailyRunToday` is false (app was closed at
+   prep time, or `background_preparation: off`), run the `li-daily` steps now, in order, interactively,
+   logging it with `run start/finish --job li-daily --period day` so the 08:30 job won't repeat it (you may ask, and open pages only per the guardrails). Otherwise
+   handle only what is new since that run. Either way every daily action is covered:
+   `followups` → `jobFollowups` / `dealsDue` → `nurtureDue` + `revisitDue` → new-prospect next actions
+   → posts.
+2. Also from `status`: `pausedTasksToReassess`, `pendingDecisions`, `staleResearch` that blocks
+   today's work. Top up only if the queue is thin. Respect feature switches.
 3. Re-run `status` and walk the user through `todayPlan` **one task at a time**:
    - show: title, why, estimated time, the draft (ready to copy);
    - if `linkedin_open_pages: on` and the user is ready, open the ONE LinkedIn URL for that task

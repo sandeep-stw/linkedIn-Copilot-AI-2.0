@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 — 2026-10-02
+- Your daily session now always covers every daily action (follow-ups, job follow-ups or deal next steps,
+  stay-in-touch messages, "not now" revisits, new outreach, posts), even if the 08:30 preparation didn't run.
+- Daily actions are ranked by value so a short session does replies, interviews and hot contacts first.
+
 ## 0.3.0 — 2026-10-02
 Nurture relationships and keep every status accurate.
 - New `li-nurture`: hot / warm / cold warmth with a touch cadence (4 / 10 / 25 working days), one useful
