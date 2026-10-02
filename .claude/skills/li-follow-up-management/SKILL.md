@@ -24,7 +24,9 @@ later; after 2 unanswered follow-ups → pause the prospect. Business days use `
 ## Handling `followups` actions
 - `follow_up_N` → draft an `interactions` follow-up (adds something useful; never guilt-trips) +
   task `dedupeKey: followup:<prospectId>:<N>`.
-- `pause` → prospect `relationshipStage: paused`, cancel open contact tasks.
+- `pause` → cancel open follow-up tasks; hand the person to `li-nurture` as `nurtureTrack: long_term`
+  (`temperature: cold`, `revisitOn` = `nurture_cold_business_days` ahead) instead of dropping them.
+  Use `relationshipStage: paused` (with `stageReason`) only if the student wants no more contact for now.
 - `reassess_reply` → ask the user what the reply said (if not already recorded), then route to
   li-relationship-guidance.
 
@@ -36,7 +38,9 @@ later; after 2 unanswered follow-ups → pause the prospect. Business days use `
 4. Decline or opt-out → also record `decline_received`, set `doNotContact: true`,
    `relationshipStage: declined`, cancel every open contact task for the person across ALL
    campaigns. Confirm to the user that contact has stopped.
-5. Otherwise draft the reply and suggest the next step (meeting, resource, referral ask).
+5. "Not now" / "later" → `li-nurture` §"Not now" intake (long-term track with a revisit date).
+6. Otherwise set `temperature: hot`, advance the stage with a `stageReason`, draft the reply and
+   suggest the next step (meeting, resource, referral ask).
 
 ## Completion criteria
 Every due follow-up has exactly one prepared task; replies pause sequences; declines stop them.

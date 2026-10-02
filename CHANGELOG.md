@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 — 2026-10-02
+Nurture relationships and keep every status accurate.
+- New `li-nurture`: hot / warm / cold warmth with a touch cadence (4 / 10 / 25 working days), one useful
+  touch drafted when due (never an empty check-in), "not now" contacts saved with their reason and brought
+  back on their revisit date, weekly going-cold alerts and relationship review.
+- Status is maintained automatically: every stage change is recorded with date, who and why; jumps to
+  connected or beyond need a real interaction; only you can move someone out of "declined".
+- Last touch, touch count and next touch update by themselves when you confirm a message.
+- People who never reply after follow-ups move to a long-term list instead of being dropped.
+- Dashboard: new Relationships view (counts per stage, touches due, going cold, revisits). Guide: Step 5
+  is now "Handle replies and stay in touch".
+
 ## 0.2.0 — 2026-10-02
 Find jobs and win clients, not just network.
 - New `li-job-search` (career mode): daily LinkedIn Jobs search links, paste a post to get a 0–100 fit score

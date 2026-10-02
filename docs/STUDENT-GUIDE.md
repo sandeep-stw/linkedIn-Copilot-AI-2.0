@@ -32,6 +32,12 @@ Someone said no? Paste it — Claude stops all contact with that person, permane
 
 Only 5 minutes today? Say **"I have 5 minutes"** — you get the single most valuable task.
 
+**Staying in touch.** Everyone you're building a relationship with has a warmth and a next-touch date:
+hot (every 4 working days), warm (every 10), cold or "not now" (every 25). Claude drafts one *useful*
+touch when it's due — a comment, congratulations on real news, a helpful article — never an empty
+"just checking in". Paste "not now" replies and Claude brings that person back on the date they gave.
+Ask **"who is going cold?"** any time.
+
 ## 3. Find jobs or win clients
 
 **Career mode (LinkedIn job posts only)**

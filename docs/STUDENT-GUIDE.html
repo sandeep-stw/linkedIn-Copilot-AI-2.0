@@ -142,7 +142,7 @@ footer { color: var(--muted); font-size: var(--step--1); }
     <a href="#first-run"><span class="n">2</span>First run</a>
     <a href="#daily"><span class="n">3</span>Every day</a>
     <a href="#jobs-sales"><span class="n">4</span>Jobs &amp; selling</a>
-    <a href="#replies"><span class="n">5</span>Replies</a>
+    <a href="#replies"><span class="n">5</span>Replies &amp; staying in touch</a>
     <a href="#schedule"><span class="n">6</span>Weekly &amp; monthly</a>
     <a href="#settings"><span class="n">7</span>Settings</a>
     <span class="label ref">Reference</span>
@@ -247,13 +247,29 @@ footer { color: var(--muted); font-size: var(--step--1); }
 
     <section id="replies">
       <span class="eyebrow">Step 5 of 7</span>
-      <h2>Handle replies</h2>
+      <h2>Handle replies and stay in touch</h2>
       <ol class="steps">
         <li><div><p><span class="who you">You</span>type <b>"I got a reply"</b> and paste the message.</p></div></li>
         <li><div><p><span class="who ai">Claude</span>pauses follow-ups for that person and drafts your answer.</p></div></li>
       </ol>
       <p>If someone says no or asks you to stop, paste it too. Claude marks them <b>do not contact</b> and cancels every planned message to them, permanently. Only you can undo that.</p>
-      <p>No reply? Claude suggests a first follow-up after 5 working days and a second after 7 more, then stops.</p>
+      <p>No reply? Claude suggests a first follow-up after 5 working days and a second after 7 more. After that the person moves to a slow, long-term list instead of being forgotten.</p>
+      <h3>Staying in touch</h3>
+      <p>Every person you're building a relationship with has a <b>warmth</b> and a <b>next touch</b> date. Claude keeps both up to date from what you report.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Warmth</th><th>Who</th><th>Touch every</th></tr></thead>
+        <tbody>
+          <tr><td>Hot</td><td>Replying, a meeting planned, or an open opportunity</td><td>4 working days</td></tr>
+          <tr><td>Warm</td><td>Friendly, replies now and then</td><td>10 working days</td></tr>
+          <tr><td>Cold</td><td>No response yet, or "not now"</td><td>25 working days</td></tr>
+        </tbody>
+      </table></div>
+      <ol class="steps">
+        <li><div><p><span class="who ai">Claude</span>drafts one useful touch when it's due: a comment on their post, congratulations on real news, a helpful article, or a reply to something they asked. Never an empty "just checking in".</p></div></li>
+        <li><div><p><span class="who you">You</span>send it and type <code>done</code>. The next touch date updates by itself.</p></div></li>
+        <li><div><p><span class="who you">You</span>paste "not now" replies. Claude saves their reason and brings them back on the date they suggested.</p></div></li>
+        <li><div><p><span class="who ai">Claude</span>warns you each week about who is going cold and keeps every person's status and its history accurate.</p></div></li>
+      </ol>
     </section>
 
     <section id="schedule">
@@ -262,8 +278,8 @@ footer { color: var(--muted); font-size: var(--step--1); }
       <div class="tw"><table>
         <thead><tr><th>When</th><th>What happens</th></tr></thead>
         <tbody>
-          <tr><td>Mon–Fri 08:30</td><td>Follow-ups, job search links or deal next steps, next messages, post drafts and today's plan are prepared.</td></tr>
-          <tr><td>Friday 17:00</td><td>Weekly review: results, the main bottleneck, your job search or sales pipeline, new people to contact, next week's posts.</td></tr>
+          <tr><td>Mon–Fri 08:30</td><td>Follow-ups, job search links or deal next steps, stay-in-touch messages, next messages, post drafts and today's plan are prepared.</td></tr>
+          <tr><td>Friday 17:00</td><td>Weekly review: results, the main bottleneck, your job search or sales pipeline, who warmed up or is going cold, new people to contact, next week's posts.</td></tr>
           <tr><td>1st of month</td><td>Re-reads your Upwork profile, refreshes research, re-checks your profile and reviews the month.</td></tr>
         </tbody>
       </table></div>
@@ -282,6 +298,7 @@ footer { color: var(--muted); font-size: var(--step--1); }
         <button type="button" data-copy="Only remote jobs">Only remote jobs</button>
         <button type="button" data-copy="Show jobs posted in the last 24 hours">Jobs from the last 24 hours</button>
         <button type="button" data-copy="Aim for 10 applications a week">10 applications a week</button>
+        <button type="button" data-copy="Touch warm contacts every 2 weeks">Warm contacts every 2 weeks</button>
         <button type="button" data-copy="Stop the daily preparation">Stop the daily preparation</button>
       </div>
       <p>Your settings live in <code>linkedin-copilot/settings/PREFERENCES.md</code>. Your dashboard is <code>linkedin-copilot/dashboard/index.html</code>: open it in a browser to see today's tasks, your people, conversations, posts and progress.</p>
@@ -300,6 +317,8 @@ footer { color: var(--muted); font-size: var(--step--1); }
           <tr><td>applied &middot; I have an interview</td><td>Update the job and get interview prep.</td></tr>
           <tr><td>write a proposal for &hellip;</td><td>Business mode: a proposal for that buyer.</td></tr>
           <tr><td>they said it's too expensive</td><td>An honest answer to the objection.</td></tr>
+          <tr><td>who is going cold?</td><td>People you haven't touched for too long, with a suggested next step.</td></tr>
+          <tr><td>(paste a "not now" reply)</td><td>Saves their reason and the date to come back.</td></tr>
           <tr><td><code>/linkedin-copilot review</code></td><td>How is it going? Results and what to change.</td></tr>
           <tr><td><code>/li-profile-optimization</code></td><td>Improve your LinkedIn profile again.</td></tr>
           <tr><td><code>/li-prospect-research</code></td><td>Find more people to connect with.</td></tr>

@@ -1,7 +1,7 @@
 ---
 name: li-content-research
 description: "LinkedIn Copilot: plan the weekly LinkedIn content calendar and prepare post drafts up to the weekly quota. Use daily to top up drafts, weekly to plan the calendar, or when the user asks for a post."
-cadence: "Daily (step 5) + Weekly (step 4)"
+cadence: "Daily (step 6) + Weekly (step 5)"
 feature: content_research (ideas/calendar), post_drafting (drafts)
 covers: FR-06, FR-07, AC-05, AC-08, AC-17
 ---
@@ -10,7 +10,7 @@ covers: FR-06, FR-07, AC-05, AC-08, AC-17
 
 > **First:** run `python "linkedin-copilot/tools/install.py" .` (installs/upgrades the working folder;
 > no-op when current), then follow `linkedin-copilot/instructions/SKILL-RUN-PROTOCOL.md` (bootstrap, feature switch, run log,
-> interactive vs scheduled behaviour). Cadence: Daily (step 5) + Weekly (step 4).
+> interactive vs scheduled behaviour). Cadence: Daily (step 6) + Weekly (step 5).
 
 ## Inputs
 Campaign audience and goal; prior `content` records (avoid repeats); `post_drafts_per_week`;

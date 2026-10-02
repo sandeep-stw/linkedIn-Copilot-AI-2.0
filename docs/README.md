@@ -40,14 +40,16 @@ Claude Code, and run:
 | Daily 1 | `/linkedin-copilot:li-follow-up-management` | Follow-ups, replies, declines |
 | Daily 2 | `/linkedin-copilot:li-job-search` | Career: LinkedIn job posts → fit score → tailored application → follow-up → interview prep |
 | Daily 2 | `/linkedin-copilot:li-sales-pitch` | Business: pitch kit and deals from conversation to close |
-| Daily 3 | `/linkedin-copilot:li-relationship-guidance` | Next action + message draft per person |
-| Daily 4 | `/linkedin-copilot:li-product-validation` | Interview invites (business mode) |
-| Daily 5 | `/linkedin-copilot:li-content-research` | Post drafts |
-| Daily 6 | `/linkedin-copilot:li-tracker-management` | Today's plan + dashboard |
+| Daily 3 | `/linkedin-copilot:li-nurture` | Stay-in-touch messages by warmth, "not now" revisits, going-cold alerts, status history |
+| Daily 4 | `/linkedin-copilot:li-relationship-guidance` | Next action + message draft per person |
+| Daily 5 | `/linkedin-copilot:li-product-validation` | Interview invites (business mode) |
+| Daily 6 | `/linkedin-copilot:li-content-research` | Post drafts |
+| Daily 7 | `/linkedin-copilot:li-tracker-management` | Today's plan + dashboard |
 | Weekly | `/linkedin-copilot:li-weekly` | Review → job search or sales pipeline → new prospects → next week's posts |
 | Weekly 1 | `/linkedin-copilot:li-campaign-review` | Results, bottleneck, adjustments |
 | Weekly 2 | `li-job-search` / `li-sales-pitch` | Tune job search filters, or review deals and the pitch kit |
-| Weekly 3 | `/linkedin-copilot:li-prospect-research` | More people to connect with |
+| Weekly 3 | `li-nurture` | Relationship review: warmed up, going cold, no plan, stage clean-up |
+| Weekly 4 | `/linkedin-copilot:li-prospect-research` | More people to connect with |
 | Monthly | `/linkedin-copilot:li-monthly` | Upwork re-sync → research refresh → profile re-check → monthly review |
 
 ## Safety and LinkedIn policy

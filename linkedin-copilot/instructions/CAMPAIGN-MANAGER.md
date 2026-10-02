@@ -27,6 +27,7 @@ The user owns direction choices, verification of personal claims, and every acti
 | Shortlist below `initial_shortlist` or target | li-prospect-research |
 | Prospects shortlisted without next action | li-relationship-guidance |
 | Follow-ups due / replies / declines | li-follow-up-management |
+| Touches due, revisit dates, going cold, stage updates | li-nurture |
 | Career mode: job search links, pasted job posts, applications, interviews | li-job-search |
 | Business mode: pitch kit, deals due, proposals, objections | li-sales-pitch |
 | Business mode + validation_interviews on | li-product-validation |

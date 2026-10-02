@@ -35,6 +35,7 @@ Unknown keys or invalid values are reported as issues and never silently enable 
 - reminders: on
 - job_search: on
 - sales_pitch: on
+- nurture: on
 
 ## Workload
 - minutes_per_day: 15
@@ -72,6 +73,11 @@ Unknown keys or invalid values are reported as issues and never silently enable 
 
 ## Sales (business mode)
 - deal_follow_up_business_days: 3
+
+## Nurture (business days between useful touches)
+- nurture_hot_business_days: 4
+- nurture_warm_business_days: 10
+- nurture_cold_business_days: 25
 
 ## Execution
 - linkedin_mode: browser_assisted

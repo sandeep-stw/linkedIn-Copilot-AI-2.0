@@ -1,7 +1,7 @@
 ---
 name: li-product-validation
 description: "LinkedIn Copilot: run the ten-person product validation interview campaign (business mode) — invitations, discussion guide, findings, and continue/narrow/revise/pause recommendation."
-cadence: "Daily (step 4, business mode) + Monthly (step 4)"
+cadence: "Daily (step 5, business mode) + Monthly (step 4)"
 feature: validation_interviews
 covers: FR-13, FR-14, AC-15
 ---
@@ -10,7 +10,7 @@ covers: FR-13, FR-14, AC-15
 
 > **First:** run `python "linkedin-copilot/tools/install.py" .` (installs/upgrades the working folder;
 > no-op when current), then follow `linkedin-copilot/instructions/SKILL-RUN-PROTOCOL.md` (bootstrap, feature switch, run log,
-> interactive vs scheduled behaviour). Cadence: Daily (step 4, business mode) + Monthly (step 4).
+> interactive vs scheduled behaviour). Cadence: Daily (step 5, business mode) + Monthly (step 4).
 
 ## Inputs
 Business campaign, one defined segment, prospects in that segment, `validation_participants`.

@@ -101,7 +101,7 @@ ONOFF = ["on", "off"]
 FEATURES = ["career_research", "offer_research", "profile_optimization", "content_research", "post_drafting",
             "prospect_research", "relationship_guidance", "connection_drafting", "follow_up_drafting",
             "validation_interviews", "meeting_preparation", "weekly_review", "reminders",
-            "job_search", "sales_pitch"]
+            "job_search", "sales_pitch", "nurture"]
 PREF_SCHEMA = {
     "mode": ["career", "business"],
     "prospect_target": ("int", 1, 5000),
@@ -144,6 +144,9 @@ PREF_SCHEMA = {
     "min_job_fit": ("int", 0, 100),
     "job_follow_up_business_days": ("int", 1, 30),
     "deal_follow_up_business_days": ("int", 1, 30),
+    "nurture_hot_business_days": ("int", 1, 30),
+    "nurture_warm_business_days": ("int", 1, 60),
+    "nurture_cold_business_days": ("int", 1, 120),
 }
 # Safety-critical values that must never be silently enabled by a typo or unknown value.
 SAFE_DEFAULTS = {"store_credentials": "off", "contact_export": "off", "external_action_approval": "on",
@@ -239,6 +242,8 @@ JOB_STAGES = ["found", "shortlisted", "preparing", "applied", "screening", "inte
               "accepted", "rejected", "withdrawn", "closed"]
 JOB_APPLIED_STAGES = ["applied", "screening", "interviewing", "offer", "accepted", "rejected"]
 DEAL_STAGES = ["conversation", "discovery", "proposal_drafted", "proposal_sent", "negotiation", "won", "lost", "paused"]
+STAGE_ORDER = ["shortlisted", "engaging", "invited", "connected", "conversing", "meeting", "referral", "opportunity"]
+EVIDENCE_STAGES = STAGE_ORDER[STAGE_ORDER.index("connected"):]  # need a real interaction (or stated evidence)
 CONTENT_KINDS = ["post", "pitch_kit", "one_pager", "proposal", "cover_note", "resume_tailoring",
                  "objection_answers", "interview_prep"]
 SCHEMAS = {
@@ -254,7 +259,9 @@ SCHEMAS = {
                           "activityStatus"],
                   "enum": {"relationshipStage": ["shortlisted", "engaging", "invited", "connected", "conversing",
                                                  "meeting", "referral", "opportunity", "paused", "declined"],
-                           "activityStatus": ["active", "inactive", "unknown"]},
+                           "activityStatus": ["active", "inactive", "unknown"],
+                           "nurtureTrack": ["none", "active", "long_term"],
+                           "temperature": ["hot", "warm", "cold"]},
                   "refs": {"nextActionId": "tasks"}},
     "interactions": {"req": ["prospectId", "type", "status", "direction"],
                      "enum": {"status": ACTION_STATES, "direction": ["outgoing", "incoming"],
@@ -375,6 +382,19 @@ def record_errors(name, rec, all_docs, prefs):
             errs.append("won deal needs outcomeEvidence (what the buyer committed to, in the user's words)")
         if rec.get("stage") not in ("won", "lost", "paused") and not rec.get("nextStepDue"):
             errs.append("open deal needs nextStepDue (YYYY-MM-DD)")
+    if name == "prospects" and rec.get("relationshipStage") in EVIDENCE_STAGES and not rec.get("stageEvidence"):
+        has = any(i.get("prospectId") == rec["id"] and i.get("status") == "completed"
+                  for i in all_docs["interactions"]["records"])
+        if not has:
+            errs.append(f"stage '{rec['relationshipStage']}' needs a completed interaction with this person, "
+                        "or 'stageEvidence' (e.g. 'already a 1st-degree connection — user said')")
+    if name == "prospects" and rec.get("nurtureTrack") in ("active", "long_term") and not rec.get("temperature"):
+        errs.append("a nurtured prospect needs temperature hot|warm|cold")
+    if name == "prospects" and rec.get("nurtureTrack") == "long_term" and not rec.get("revisitOn"):
+        errs.append("long-term nurture needs revisitOn (YYYY-MM-DD) and ideally notNowReason")
+    if name == "prospects" and (rec.get("doNotContact") or rec.get("relationshipStage") == "declined") \
+            and rec.get("nurtureTrack") in ("active", "long_term"):
+        errs.append("declined / do-not-contact people cannot be nurtured")
     if name == "prospects" and rec.get("activityStatus") == "active":
         ev = rec.get("activityEvidence") or {}
         seen = parse_time(ev.get("observedAt")) if isinstance(ev, dict) else None
@@ -489,6 +509,7 @@ def upsert(name, payload, expect_revision, actor):
         doc = docs[name]
         incoming = payload if isinstance(payload, list) else [payload]
         stamp, changed = iso(now_utc()), []
+        newly_completed = []
         for rec in incoming:
             if not isinstance(rec, dict):
                 die("each record must be a JSON object")
@@ -500,10 +521,23 @@ def upsert(name, payload, expect_revision, actor):
                 if name == "prospects" and existing.get("doNotContact") and rec.get("doNotContact") is False \
                         and actor != "user":
                     die(f"{rec['id']}: only the user may clear a do-not-contact flag", 2)
+                if name == "prospects" and existing.get("relationshipStage") == "declined" \
+                        and rec.get("relationshipStage") not in (None, "declined") and actor != "user":
+                    die(f"{rec['id']}: only the user may move a person out of 'declined'", 2)
                 merged = {**existing, **rec, "createdAt": existing.get("createdAt", stamp), "updatedAt": stamp}
             else:
                 merged = {**rec, "createdAt": rec.get("createdAt", stamp), "updatedAt": stamp}
                 merged.setdefault("provenance", actor)
+            if name == "prospects":  # status history is maintained here, never by hand
+                before = existing.get("relationshipStage") if existing else None
+                reason = merged.pop("stageReason", None)
+                if merged.get("relationshipStage") != before:
+                    merged["stageHistory"] = list(merged.get("stageHistory") or []) + [
+                        {"from": before, "to": merged.get("relationshipStage"), "at": stamp, "by": actor,
+                         "reason": reason}]
+            if name == "interactions" and merged.get("status") == "completed" \
+                    and (not existing or existing.get("status") != "completed"):
+                newly_completed.append(merged)
             if name == "tasks" and not existing:
                 dup = next((t for t in doc["records"] if t.get("dedupeKey") == merged.get("dedupeKey")
                             and t["status"] in OPEN_TASK_STATES + ["paused"]), None)
@@ -536,8 +570,30 @@ def upsert(name, payload, expect_revision, actor):
                     cancelled.append(t["id"])
             if cancelled:
                 save("tasks", tasks)
+        touched = []
+        if name == "interactions" and newly_completed:  # keep last/next touch in step with real interactions
+            pros = docs["prospects"]
+            tz, _ = get_tz(prefs.get("timezone", "UTC"))
+            for i in newly_completed:
+                pr = next((x for x in pros["records"] if x["id"] == i["prospectId"]), None)
+                if not pr:
+                    continue
+                when = parse_time(i.get("occurredAt")) or now_utc()
+                if i["direction"] == "outgoing":
+                    pr["lastTouchAt"] = iso(when)
+                    pr["touchCount"] = int(pr.get("touchCount") or 0) + 1
+                    if pr.get("nurtureTrack") in ("active", "long_term"):
+                        pr["nextTouchDue"] = add_business_days(when.astimezone(tz).date(), touch_cadence(pr, prefs),
+                                                               prefs.get("working_days", DAY_NAMES[:5])).isoformat()
+                else:
+                    pr["lastInboundAt"] = iso(when)
+                pr["updatedAt"] = stamp
+                touched.append(pr["id"])
+            if touched:
+                save("prospects", pros)
     print(json.dumps({"ok": True, "file": name, "revision": rev, "changed": changed,
-                      **({"cancelledTasks": cancelled} if cancelled else {})}))
+                      **({"cancelledTasks": cancelled} if cancelled else {}),
+                      **({"touchUpdated": touched} if touched else {})}))
 
 # --------------------------------------------------------------------------- analysis
 
@@ -614,6 +670,45 @@ def linkedin_jobs_url(keywords, location, prefs):
             q[param] = code
     q["sortBy"] = "DD"
     return "https://www.linkedin.com/jobs/search/?" + urlencode(q)
+
+
+def touch_cadence(prospect, prefs):
+    """Business days between nurture touches for this person."""
+    if prospect.get("nurtureTrack") == "long_term":
+        return prefs.get("nurture_cold_business_days", 25)
+    return {"hot": prefs.get("nurture_hot_business_days", 4), "warm": prefs.get("nurture_warm_business_days", 10),
+            "cold": prefs.get("nurture_cold_business_days", 25)}.get(prospect.get("temperature") or "warm")
+
+
+def compute_nurture(docs, prefs, today):
+    wd = prefs.get("working_days", DAY_NAMES[:5])
+    tz, _ = get_tz(prefs.get("timezone", "UTC"))
+    due, revisit, cold, unplanned = [], [], [], []
+    for p in docs["prospects"]["records"]:
+        if p.get("doNotContact") or p.get("relationshipStage") == "declined":
+            continue
+        track = p.get("nurtureTrack") or "none"
+        last = parse_time(p.get("lastTouchAt"))
+        brief = {"prospectId": p["id"], "name": p["name"], "stage": p["relationshipStage"],
+                 "temperature": p.get("temperature"), "lastTouchAt": p.get("lastTouchAt")}
+        if track == "long_term":
+            if p.get("revisitOn") and dt.date.fromisoformat(p["revisitOn"][:10]) <= today:
+                revisit.append({**brief, "revisitOn": p["revisitOn"], "notNowReason": p.get("notNowReason")})
+            continue
+        if track == "active":
+            nxt = p.get("nextTouchDue")
+            if not nxt and last:
+                nxt = add_business_days(last.astimezone(tz).date(), touch_cadence(p, prefs), wd).isoformat()
+            if not nxt or dt.date.fromisoformat(nxt[:10]) <= today:
+                due.append({**brief, "due": nxt or "now"})
+            if last and add_business_days(last.astimezone(tz).date(), 2 * touch_cadence(p, prefs), wd) <= today:
+                cold.append({**brief, "cadenceBusinessDays": touch_cadence(p, prefs)})
+        elif p["relationshipStage"] in EVIDENCE_STAGES:
+            unplanned.append(brief)  # a real relationship with no nurture plan yet
+    funnel = {s: sum(1 for p in docs["prospects"]["records"] if p["relationshipStage"] == s)
+              for s in STAGE_ORDER + ["paused", "declined"]}
+    return {"nurtureDue": due, "revisitDue": revisit, "goingCold": cold, "noNurturePlan": unplanned,
+            "relationshipFunnel": {k: v for k, v in funnel.items() if v}}
 
 
 def compute_pipeline(docs, prefs, today):
@@ -706,6 +801,7 @@ def compute_status(minutes=None):
         "pendingDecisions": [r["id"] for r in proposed],
         "followups": compute_followups(docs, prefs),
         **compute_pipeline(docs, prefs, today),
+        **compute_nurture(docs, prefs, today),
         "staleResearch": stale,
         "tasksNeedingFeaturePause": paused_by_feature,
         "pausedTasksToReassess": reassess,
@@ -837,10 +933,16 @@ def render_dashboard():
 <dt>Stage</dt><dd>{e(goal.get('stage'))}</dd><dt>Success measures</dt><dd>{e(goal.get('successMeasures'))}</dd>
 <dt>Milestones</dt><dd>{e(goal.get('milestones'))}</dd><dt>Evidence gaps</dt><dd>{e(goal.get('evidenceGaps'))}</dd>
 <dt>Blockers</dt><dd>{e(goal.get('blockers'))}</dd></dl>""",
+        "Relationships": f"""<p class="muted">By stage: {e(' · '.join(f'{k} {v}' for k, v in st['relationshipFunnel'].items()) or 'nobody yet')}</p>
+<h3>Touches due</h3>{table(st['nurtureDue'], [('Person', lambda r: e(r['name'])), ('Stage', lambda r: e(r['stage'])), ('Warmth', lambda r: e(r['temperature'])), ('Last touch', lambda r: e(r['lastTouchAt'])), ('Due', lambda r: e(r['due']))], 'No touches due today.')}
+<h3>Going cold</h3>{table(st['goingCold'], [('Person', lambda r: e(r['name'])), ('Stage', lambda r: e(r['stage'])), ('Last touch', lambda r: e(r['lastTouchAt']))], 'Nobody is going cold.')}
+<h3>Back on the list (not now → revisit)</h3>{table(st['revisitDue'], [('Person', lambda r: e(r['name'])), ('Reason they said not now', lambda r: e(r.get('notNowReason'))), ('Revisit on', lambda r: e(r['revisitOn']))], 'No one to revisit yet.')}
+<h3>Real relationships without a nurture plan</h3>{table(st['noNurturePlan'], [('Person', lambda r: e(r['name'])), ('Stage', lambda r: e(r['stage']))], 'Every relationship has a plan.')}""",
         "Prospects": table(R["prospects"], [("Name", lambda r: e(r["name"])), ("Role", lambda r: e(r.get("role"))),
             ("Company", lambda r: e(r.get("company"))), ("Category", lambda r: e(r["category"])),
             ("Fit", lambda r: e(r.get("fitScore"))), ("Activity", lambda r: e(r["activityStatus"])),
-            ("Stage", lambda r: e(r["relationshipStage"])),
+            ("Stage", lambda r: e(r["relationshipStage"])), ("Warmth", lambda r: e(r.get("temperature"))),
+            ("Next touch", lambda r: e(r.get("nextTouchDue") or r.get("revisitOn"))),
             ("DNC", lambda r: "⛔" if r.get("doNotContact") else ""), ("Next", lambda r: e(r.get("nextActionId")))]),
         "Conversations": table(sorted(R["interactions"], key=lambda r: r.get("occurredAt") or r["updatedAt"], reverse=True),
             [("When", lambda r: e(r.get("occurredAt"))), ("Prospect", lambda r: pname(r["prospectId"])),

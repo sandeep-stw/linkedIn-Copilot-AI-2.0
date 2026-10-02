@@ -38,6 +38,7 @@ them in this session. Each also runs standalone as `/li-<name>`.
 | `review` | li-campaign-review (interactive) |
 | `jobs`, "find jobs", pasted LinkedIn job post, "applied", "interview" | li-job-search |
 | `sell`, "pitch", "proposal", "objection", "they want to buy" | li-sales-pitch |
+| "stay in touch", "who is going cold", "not now", "update <name>'s status" | li-nurture |
 | `settings …`, "give me 20 minutes a day", "turn off X" | **Settings** |
 | `scheduled-prep`, `daily-run` | run `/li-daily` (unattended) |
 | `weekly-review`, `weekly-run` | run `/li-weekly` |
@@ -78,8 +79,8 @@ Delegated to the runner skills, which own gating, ordering and the run log:
 
 | Cadence | Runner | Order |
 | --- | --- | --- |
-| Daily (Mon–Fri) | `/li-daily` | follow-ups → job search (career) or sales pipeline (business) → relationship actions → validation (business) → post drafts → plan + dashboard |
-| Weekly | `/li-weekly` | campaign review → job search or pipeline review → prospect top-up → content calendar → plan + dashboard |
+| Daily (Mon–Fri) | `/li-daily` | follow-ups → job search (career) or sales pipeline (business) → nurture touches → relationship actions → validation (business) → post drafts → plan + dashboard |
+| Weekly | `/li-weekly` | campaign review → job search or pipeline review → relationship review → prospect top-up → content calendar → plan + dashboard |
 | Monthly | `/li-monthly` | Upwork re-sync → research refresh → profile re-audit → validation synthesis → monthly review → housekeeping |
 
 ## 6. Recurring schedule (offer once, during onboarding or on request)
