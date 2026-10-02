@@ -1,0 +1,12 @@
+# Personal campaign data — never ship to students or commit
+linkedin-copilot/data/*.json
+linkedin-copilot/data/.backups/
+linkedin-copilot/data/.lock
+linkedin-copilot/inputs/
+linkedin-copilot/dashboard/index.html
+*.tmp*
+__pycache__/
+
+# Build output (publish dist/stw-courses separately)
+dist/
+dist-check.log

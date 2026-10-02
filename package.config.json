@@ -1,0 +1,138 @@
+{
+  "name": "linkedin-copilot",
+  "displayName": "LinkedIn AI Copilot",
+  "version": "0.1.0",
+  "description": "AI-first LinkedIn career & sales copilot: builds options from your Upwork profile, résumé PDF and LinkedIn profile, then prepares daily, weekly and monthly actions you complete in LinkedIn (policy-safe, browser-assisted).",
+  "author": {
+    "name": "STW Services"
+  },
+  "license": "Proprietary",
+  "keywords": [
+    "linkedin",
+    "career",
+    "sales",
+    "upwork",
+    "students",
+    "networking"
+  ],
+  "skills": {
+    "from": ".claude/skills",
+    "include": [
+      "linkedin-copilot",
+      "li-*"
+    ]
+  },
+  "template": {
+    "from": "linkedin-copilot",
+    "to": "template/linkedin-copilot",
+    "exclude": [
+      "data/*.json",
+      "data/.backups",
+      "data/.lock",
+      "inputs",
+      "dashboard/index.html",
+      "VERSION"
+    ],
+    "reset": {
+      "settings/PREFERENCES.md": {
+        "timezone": "UTC",
+        "mode": "career"
+      }
+    },
+    "write": {
+      "VERSION": "{version}\n"
+    }
+  },
+  "forbidden": [
+    "Git AI Project",
+    "Upwork_MCP",
+    "Users\\\\STW",
+    "a520bd69"
+  ],
+  "allowPatterns": [
+    "C:\\\\Users\\\\\\.\\.\\.\\\\"
+  ],
+  "marketplace": {
+    "name": "stw-courses",
+    "owner": {
+      "name": "STW Services"
+    },
+    "description": "Course plugins from STW Services"
+  },
+  "output": "dist",
+  "targets": [
+    "kit",
+    "plugin"
+  ],
+  "forbiddenFiles": [
+    "**/data/*.json",
+    "**/inputs/**",
+    "**/dashboard/index.html",
+    "package.config.json",
+    "PLAN.md",
+    "**/dist/**",
+    "**/build-report.json"
+  ],
+  "kit": {
+    "name": "LinkedIn-Copilot-Student-Kit",
+    "docs": {
+      "START-HERE.md": "docs/START-HERE.md",
+      "STUDENT-GUIDE.md": "docs/STUDENT-GUIDE.md",
+      "CHANGELOG.md": "CHANGELOG.md",
+      ".gitignore": "docs/kit.gitignore"
+    },
+    "smokeTest": [
+      "{python} linkedin-copilot/tools/install.py .",
+      "{python} linkedin-copilot/tools/store.py init",
+      "{python} linkedin-copilot/tools/store.py validate",
+      "{python} linkedin-copilot/tools/store.py status",
+      "{python} linkedin-copilot/tools/store.py set-pref minutes_per_day 20",
+      "{python} linkedin-copilot/tools/store.py dashboard",
+      "{python} \"{work}/linkedin-copilot/tools/install.py\" \"{project}\"",
+      "{python} -c \"import os,sys; sys.exit(0 if os.path.isfile(r'{project}/.claude/skills/li-daily/SKILL.md') else 1)\"",
+      "{python} -c \"open(r'{project}/linkedin-copilot/VERSION','w').write('0.0.1')\"",
+      "{python} \"{work}/linkedin-copilot/tools/install.py\" \"{project}\""
+    ]
+  },
+  "plugin": {
+    "docs": {
+      "README.md": "docs/README.md",
+      "STUDENT-GUIDE.md": "docs/STUDENT-GUIDE.md",
+      "CHANGELOG.md": "CHANGELOG.md"
+    },
+    "rewrites": [
+      {
+        "files": [
+          "skills/**/*.md"
+        ],
+        "pattern": "\\.claude/skills/",
+        "replace": "${CLAUDE_PLUGIN_ROOT}/skills/"
+      },
+      {
+        "files": [
+          "skills/**/*.md"
+        ],
+        "pattern": "\"linkedin-copilot/tools/install\\.py\"",
+        "replace": "\"${CLAUDE_PLUGIN_ROOT}/template/linkedin-copilot/tools/install.py\""
+      },
+      {
+        "files": [
+          "skills/**/*.md",
+          "STUDENT-GUIDE.md",
+          "CHANGELOG.md"
+        ],
+        "pattern": "(?<![\\w./:-])/(li-[a-z<|>-]+|linkedin-copilot)(?![\\w/-])",
+        "replace": "/linkedin-copilot:\u0001"
+      }
+    ],
+    "smokeTest": [
+      "{python} \"{plugin}/template/linkedin-copilot/tools/install.py\" \"{project}\"",
+      "{python} \"{project}/linkedin-copilot/tools/store.py\" init",
+      "{python} \"{project}/linkedin-copilot/tools/store.py\" validate",
+      "{python} \"{project}/linkedin-copilot/tools/store.py\" status",
+      "{python} \"{project}/linkedin-copilot/tools/store.py\" set-pref minutes_per_day 20",
+      "{python} \"{project}/linkedin-copilot/tools/store.py\" dashboard",
+      "{python} \"{plugin}/template/linkedin-copilot/tools/install.py\" \"{project}\""
+    ]
+  }
+}

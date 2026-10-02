@@ -1,0 +1,5 @@
+# Your private campaign data — never commit or share
+linkedin-copilot/data/
+linkedin-copilot/inputs/
+linkedin-copilot/dashboard/index.html
+__pycache__/
