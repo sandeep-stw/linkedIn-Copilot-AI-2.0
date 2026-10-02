@@ -1,7 +1,7 @@
 ---
 name: li-tracker-management
 description: "LinkedIn Copilot: the only way campaign state changes — confirm done/skip with provenance, build today's time-boxed plan, apply feature switches, log runs, and render the dashboard. Use when the user says done/skip/sent/posted, and at the end of every run."
-cadence: "Daily (step 5, always last) + Weekly + Monthly (last step)"
+cadence: "Daily (step 6, always last) + Weekly + Monthly (last step)"
 feature: core
 covers: FR-17, FR-19, Section 16, AC-04..AC-07, AC-11..AC-13, AC-18
 ---
@@ -10,7 +10,7 @@ covers: FR-17, FR-19, Section 16, AC-04..AC-07, AC-11..AC-13, AC-18
 
 > **First:** run `python "linkedin-copilot/tools/install.py" .` (installs/upgrades the working folder;
 > no-op when current), then follow `linkedin-copilot/instructions/SKILL-RUN-PROTOCOL.md` (bootstrap, feature switch, run log,
-> interactive vs scheduled behaviour). Cadence: Daily (step 5, always last) + Weekly + Monthly (last step).
+> interactive vs scheduled behaviour). Cadence: Daily (step 6, always last) + Weekly + Monthly (last step).
 
 All commands run from the project root: `python linkedin-copilot/tools/store.py <cmd>`.
 

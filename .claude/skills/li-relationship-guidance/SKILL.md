@@ -1,7 +1,7 @@
 ---
 name: li-relationship-guidance
 description: "LinkedIn Copilot: choose the next genuine interaction for each shortlisted prospect and draft connection notes, comments, messages, referral requests and meeting prep. Use daily, or when the user asks what to send someone."
-cadence: "Daily (step 2)"
+cadence: "Daily (step 3)"
 feature: relationship_guidance (choice of action), connection_drafting (drafts)
 covers: FR-11, FR-12, FR-16
 ---
@@ -10,7 +10,7 @@ covers: FR-11, FR-12, FR-16
 
 > **First:** run `python "linkedin-copilot/tools/install.py" .` (installs/upgrades the working folder;
 > no-op when current), then follow `linkedin-copilot/instructions/SKILL-RUN-PROTOCOL.md` (bootstrap, feature switch, run log,
-> interactive vs scheduled behaviour). Cadence: Daily (step 2).
+> interactive vs scheduled behaviour). Cadence: Daily (step 3).
 
 ## Inputs
 Prospect record + history (`interactions`), campaign goal, any post/context the user pasted,

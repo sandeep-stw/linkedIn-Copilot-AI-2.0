@@ -33,6 +33,8 @@ Unknown keys or invalid values are reported as issues and never silently enable 
 - meeting_preparation: on
 - weekly_review: on
 - reminders: on
+- job_search: on
+- sales_pitch: on
 
 ## Workload
 - minutes_per_day: 15
@@ -59,6 +61,17 @@ Unknown keys or invalid values are reported as issues and never silently enable 
 - activity_recency_days: 30
 - research_stale_days: 30
 - validation_participants: 10
+
+## Jobs (career mode — LinkedIn job posts only)
+- job_date_posted: past_week
+- job_workplace: any
+- job_experience: any
+- applications_per_week: 5
+- min_job_fit: 60
+- job_follow_up_business_days: 7
+
+## Sales (business mode)
+- deal_follow_up_business_days: 3
 
 ## Execution
 - linkedin_mode: browser_assisted

@@ -11,6 +11,8 @@
 Claude asks which of these you have — your **Upwork profile**, **résumé PDF**, **LinkedIn profile** —
 then researches and shows you 3 options to choose from. That's it.
 
+For the full walkthrough, open **`STUDENT-GUIDE.html`** in your browser.
+
 Needs **Python 3.9+** (`python --version`). Missing? Install it from python.org and tick *Add to PATH*.
 
 ## What's inside
@@ -18,7 +20,8 @@ Needs **Python 3.9+** (`python --version`). Missing? Install it from python.org 
 | Path | What it is |
 | --- | --- |
 | `START-HERE.md` | This page |
-| `STUDENT-GUIDE.md` | Daily routine, settings, do's & don'ts, FAQ |
+| `STUDENT-GUIDE.html` | **The visual step-by-step guide — double-click to open in your browser** |
+| `STUDENT-GUIDE.md` | Same guide as plain text |
 | `.claude/skills/` | The copilot's skills (don't edit) |
 | `linkedin-copilot/settings/PREFERENCES.md` | Your settings — or just tell Claude in plain words |
 | `linkedin-copilot/dashboard/index.html` | Your dashboard (appears after the first session) |

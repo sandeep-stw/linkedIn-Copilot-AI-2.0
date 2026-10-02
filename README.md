@@ -11,7 +11,7 @@ browser-assisted — nothing is sent or posted automatically).
 | --- | --- |
 | `.claude/skills/linkedin-copilot` | Entry skill — run `/linkedin-copilot` |
 | `.claude/skills/li-daily` · `li-weekly` · `li-monthly` | Scheduled runners (ordered steps) |
-| `.claude/skills/li-*` | 10 component skills (intake, research, profile, content, prospects, relationships, validation, follow-ups, review, tracker) |
+| `.claude/skills/li-*` | 12 component skills (intake, research, profile, content, prospects, relationships, job search, sales pitch, validation, follow-ups, review, tracker) |
 | `linkedin-copilot/instructions/` | Operating rules, research rules, LinkedIn policy guardrails, run protocol |
 | `linkedin-copilot/settings/PREFERENCES.md` | Single source of settings |
 | `linkedin-copilot/tools/store.py` | Validated JSON storage layer + dashboard renderer |

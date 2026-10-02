@@ -1,7 +1,7 @@
 {
   "name": "linkedin-copilot",
   "displayName": "LinkedIn AI Copilot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI-first LinkedIn career & sales copilot: builds options from your Upwork profile, résumé PDF and LinkedIn profile, then prepares daily, weekly and monthly actions you complete in LinkedIn (policy-safe, browser-assisted).",
   "author": {
     "name": "STW Services"
@@ -77,6 +77,7 @@
     "name": "LinkedIn-Copilot-Student-Kit",
     "docs": {
       "START-HERE.md": "docs/START-HERE.md",
+      "STUDENT-GUIDE.html": "docs/STUDENT-GUIDE.html",
       "STUDENT-GUIDE.md": "docs/STUDENT-GUIDE.md",
       "CHANGELOG.md": "CHANGELOG.md",
       ".gitignore": "docs/kit.gitignore"
@@ -87,6 +88,7 @@
       "{python} linkedin-copilot/tools/store.py validate",
       "{python} linkedin-copilot/tools/store.py status",
       "{python} linkedin-copilot/tools/store.py set-pref minutes_per_day 20",
+      "{python} linkedin-copilot/tools/store.py jobs-url --keywords \"Data Analyst\" --location \"Pune\"",
       "{python} linkedin-copilot/tools/store.py dashboard",
       "{python} \"{work}/linkedin-copilot/tools/install.py\" \"{project}\"",
       "{python} -c \"import os,sys; sys.exit(0 if os.path.isfile(r'{project}/.claude/skills/li-daily/SKILL.md') else 1)\"",
@@ -98,7 +100,8 @@
     "docs": {
       "README.md": "docs/README.md",
       "STUDENT-GUIDE.md": "docs/STUDENT-GUIDE.md",
-      "CHANGELOG.md": "CHANGELOG.md"
+      "CHANGELOG.md": "CHANGELOG.md",
+      "STUDENT-GUIDE.html": "docs/STUDENT-GUIDE.html"
     },
     "rewrites": [
       {
@@ -119,10 +122,11 @@
         "files": [
           "skills/**/*.md",
           "STUDENT-GUIDE.md",
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "STUDENT-GUIDE.html"
         ],
         "pattern": "(?<![\\w./:-])/(li-[a-z<|>-]+|linkedin-copilot)(?![\\w/-])",
-        "replace": "/linkedin-copilot:\u0001"
+        "replace": "/linkedin-copilot:\\1"
       }
     ],
     "smokeTest": [

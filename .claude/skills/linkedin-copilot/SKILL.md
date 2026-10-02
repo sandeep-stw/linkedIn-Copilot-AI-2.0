@@ -36,6 +36,8 @@ them in this session. Each also runs standalone as `/li-<name>`.
 | `skip <id>` | task → `skipped` with the user's reason; next task |
 | `reply`, "I got a reply", pasted message | li-follow-up-management §Reply intake |
 | `review` | li-campaign-review (interactive) |
+| `jobs`, "find jobs", pasted LinkedIn job post, "applied", "interview" | li-job-search |
+| `sell`, "pitch", "proposal", "objection", "they want to buy" | li-sales-pitch |
 | `settings …`, "give me 20 minutes a day", "turn off X" | **Settings** |
 | `scheduled-prep`, `daily-run` | run `/li-daily` (unattended) |
 | `weekly-review`, `weekly-run` | run `/li-weekly` |
@@ -51,7 +53,8 @@ them in this session. Each also runs standalone as `/li-<name>`.
 3. Run `li-opportunity-research` → present 3 ranked selection cards with a recommendation.
 4. User selects → campaign + decision saved → `li-tracker-management` creates first tasks:
    profile audit (li-profile-optimization), this week's post drafts (li-content-research), first
-   shortlist (li-prospect-research). Set `mode` with `set-pref` to match the selected direction.
+   shortlist (li-prospect-research), and either today's LinkedIn job search links (li-job-search,
+   career mode) or the pitch kit (li-sales-pitch, business mode). Set `mode` with `set-pref` to match the selected direction.
 5. Offer the schedule (§6) if not already set up. End with the first next action.
 
 ## 3. Daily (≈ minutes_per_day)
@@ -75,8 +78,8 @@ Delegated to the runner skills, which own gating, ordering and the run log:
 
 | Cadence | Runner | Order |
 | --- | --- | --- |
-| Daily (Mon–Fri) | `/li-daily` | follow-ups → relationship actions → validation (business) → post drafts → plan + dashboard |
-| Weekly | `/li-weekly` | campaign review → prospect top-up → content calendar → plan + dashboard |
+| Daily (Mon–Fri) | `/li-daily` | follow-ups → job search (career) or sales pipeline (business) → relationship actions → validation (business) → post drafts → plan + dashboard |
+| Weekly | `/li-weekly` | campaign review → job search or pipeline review → prospect top-up → content calendar → plan + dashboard |
 | Monthly | `/li-monthly` | Upwork re-sync → research refresh → profile re-audit → validation synthesis → monthly review → housekeeping |
 
 ## 6. Recurring schedule (offer once, during onboarding or on request)

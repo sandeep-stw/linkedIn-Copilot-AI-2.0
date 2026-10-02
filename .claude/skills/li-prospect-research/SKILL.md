@@ -1,7 +1,7 @@
 ---
 name: li-prospect-research
 description: "LinkedIn Copilot: define the ideal audience and build/expand a scored, deduplicated prospect shortlist from permitted sources, with LinkedIn search links the user runs. Use weekly to top up the shortlist, or when the user asks who to connect with."
-cadence: "Weekly (step 2)"
+cadence: "Weekly (step 3)"
 feature: prospect_research
 covers: FR-08, FR-09, FR-10, AC-10
 ---
@@ -10,7 +10,7 @@ covers: FR-08, FR-09, FR-10, AC-10
 
 > **First:** run `python "linkedin-copilot/tools/install.py" .` (installs/upgrades the working folder;
 > no-op when current), then follow `linkedin-copilot/instructions/SKILL-RUN-PROTOCOL.md` (bootstrap, feature switch, run log,
-> interactive vs scheduled behaviour). Cadence: Weekly (step 2).
+> interactive vs scheduled behaviour). Cadence: Weekly (step 3).
 
 ## Inputs
 Campaign, selected recommendation, `prospect_target`, `initial_shortlist`, `activity_recency_days`.

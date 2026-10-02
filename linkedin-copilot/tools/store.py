@@ -100,7 +100,8 @@ def add_business_days(day, n, working_days):
 ONOFF = ["on", "off"]
 FEATURES = ["career_research", "offer_research", "profile_optimization", "content_research", "post_drafting",
             "prospect_research", "relationship_guidance", "connection_drafting", "follow_up_drafting",
-            "validation_interviews", "meeting_preparation", "weekly_review", "reminders"]
+            "validation_interviews", "meeting_preparation", "weekly_review", "reminders",
+            "job_search", "sales_pitch"]
 PREF_SCHEMA = {
     "mode": ["career", "business"],
     "prospect_target": ("int", 1, 5000),
@@ -136,6 +137,13 @@ PREF_SCHEMA = {
     "research_stale_days": ("int", 1, 365),
     "validation_participants": ("int", 1, 50),
     "initial_shortlist": ("int", 5, 200),
+    "job_date_posted": ["past_24h", "past_week", "past_month", "any"],
+    "job_workplace": ["any", "remote", "hybrid", "onsite"],
+    "job_experience": ["any", "internship", "entry", "associate", "mid_senior", "director", "executive"],
+    "applications_per_week": ("int", 0, 50),
+    "min_job_fit": ("int", 0, 100),
+    "job_follow_up_business_days": ("int", 1, 30),
+    "deal_follow_up_business_days": ("int", 1, 30),
 }
 # Safety-critical values that must never be silently enabled by a typo or unknown value.
 SAFE_DEFAULTS = {"store_credentials": "off", "contact_export": "off", "external_action_approval": "on",
@@ -225,7 +233,14 @@ TASK_STATES = ["pending", "prepared", "awaiting_user", "completed", "skipped", "
 OPEN_TASK_STATES = ["pending", "prepared", "awaiting_user", "blocked"]
 ACTION_STATES = ["drafted", "approved", "completed", "rejected"]
 CONTACT_TASK_TYPES = ["connection_note", "message", "follow_up", "comment", "meeting_invite",
-                      "referral_request", "resource_share", "interview_invite"]
+                      "referral_request", "resource_share", "interview_invite",
+                      "job_follow_up", "pitch", "sales_follow_up", "send_proposal"]
+JOB_STAGES = ["found", "shortlisted", "preparing", "applied", "screening", "interviewing", "offer",
+              "accepted", "rejected", "withdrawn", "closed"]
+JOB_APPLIED_STAGES = ["applied", "screening", "interviewing", "offer", "accepted", "rejected"]
+DEAL_STAGES = ["conversation", "discovery", "proposal_drafted", "proposal_sent", "negotiation", "won", "lost", "paused"]
+CONTENT_KINDS = ["post", "pitch_kit", "one_pager", "proposal", "cover_note", "resume_tailoring",
+                 "objection_answers", "interview_prep"]
 SCHEMAS = {
     "research": {"req": ["question", "observedAt", "confidence", "source"],
                  "enum": {"confidence": ["high", "medium", "low"]}, "campaign": False},
@@ -248,8 +263,16 @@ SCHEMAS = {
     "tasks": {"req": ["type", "feature", "priority", "status", "title", "estMinutes", "dedupeKey"],
               "enum": {"status": TASK_STATES, "feature": FEATURES + ["core"]},
               "refs": {"relatedIds": "*"}},
-    "content": {"req": ["audience", "objective", "status", "hook", "body"],
-                "enum": {"status": ["idea"] + ACTION_STATES}},
+    "content": {"req": ["audience", "objective", "status", "body"],
+                "enum": {"status": ["idea"] + ACTION_STATES, "kind": CONTENT_KINDS},
+                "refs": {"jobId": "jobs", "dealId": "deals"}},
+    "jobs": {"req": ["title", "company", "source", "stage", "fitScore", "fitReason"],
+             "enum": {"stage": JOB_STAGES, "source": ["linkedin_job_post"],
+                      "workplace": ["remote", "hybrid", "onsite", "unknown"]},
+             "refs": {"referralProspectIds": "prospects", "coverNoteId": "content", "nextActionId": "tasks"}},
+    "deals": {"req": ["prospectId", "offer", "stage", "nextStep"],
+              "enum": {"stage": DEAL_STAGES},
+              "refs": {"prospectId": "prospects", "proposalId": "content", "nextActionId": "tasks"}},
     "interviews": {"req": ["prospectId", "schedulingState", "notesProvenance"],
                    "enum": {"schedulingState": ["proposed", "invited", "scheduled", "completed", "declined",
                                                 "no_response"],
@@ -270,7 +293,13 @@ SCHEMAS = {
 FILES = list(SCHEMAS)
 ID_PREFIX = {"research": "r", "recommendations": "rec", "campaign": "c", "prospects": "p", "interactions": "i",
              "tasks": "t", "content": "post", "interviews": "iv", "opportunities": "o", "metrics": "m",
-             "decisions": "d", "runs": "run"}
+             "decisions": "d", "runs": "run", "jobs": "job", "deals": "deal"}
+LINKEDIN_JOB_ID = re.compile(r"linkedin\.com/jobs/(?:view/(?:[^/?#]*-)?(\d+)|.*[?&]currentJobId=(\d+))")
+
+
+def linkedin_job_id(url):
+    m = LINKEDIN_JOB_ID.search(url or "")
+    return (m.group(1) or m.group(2)) if m else None
 
 
 def path_of(name):
@@ -324,8 +353,28 @@ def record_errors(name, rec, all_docs, prefs):
         errs.append("incoming interactions record something that happened: status must be completed")
     if name == "tasks" and rec.get("status") == "completed" and not rec.get("completionEvidence"):
         errs.append("completed task needs completionEvidence")
-    if name == "content" and rec.get("status") == "completed" and not rec.get("publicationEvidence"):
+    if name == "content" and rec.get("kind", "post") == "post" and not rec.get("hook"):
+        errs.append("post content needs a 'hook'")
+    if name == "content" and rec.get("kind", "post") == "post" and rec.get("status") == "completed" \
+            and not rec.get("publicationEvidence"):
         errs.append("published content needs publicationEvidence (post URL or 'user_confirmed')")
+    if name == "jobs":
+        if rec.get("postingUrl") and not linkedin_job_id(rec["postingUrl"]):
+            errs.append("postingUrl must be a LinkedIn job post URL (linkedin.com/jobs/view/<id>)")
+        if not isinstance(rec.get("fitScore"), int) or not 0 <= rec["fitScore"] <= 100:
+            errs.append("fitScore must be an integer 0-100")
+        if rec.get("stage") in JOB_APPLIED_STAGES and (not rec.get("appliedAt") or rec.get("confirmationSource")
+                                                       not in ("user_confirmed", "integration_confirmed")):
+            errs.append("applied (or later) needs appliedAt + confirmationSource user_confirmed — "
+                        "only the student's confirmation moves a job to applied")
+    if name == "deals":
+        if rec.get("stage") in ("proposal_sent", "negotiation", "won") and rec.get("confirmationSource") \
+                not in ("user_confirmed", "integration_confirmed"):
+            errs.append(f"deal stage '{rec.get('stage')}' needs confirmationSource user_confirmed")
+        if rec.get("stage") == "won" and not rec.get("outcomeEvidence"):
+            errs.append("won deal needs outcomeEvidence (what the buyer committed to, in the user's words)")
+        if rec.get("stage") not in ("won", "lost", "paused") and not rec.get("nextStepDue"):
+            errs.append("open deal needs nextStepDue (YYYY-MM-DD)")
     if name == "prospects" and rec.get("activityStatus") == "active":
         ev = rec.get("activityEvidence") or {}
         seen = parse_time(ev.get("observedAt")) if isinstance(ev, dict) else None
@@ -461,6 +510,12 @@ def upsert(name, payload, expect_revision, actor):
                 if dup:
                     print(json.dumps({"skipped_duplicate": merged.get("dedupeKey"), "existingId": dup["id"]}))
                     continue
+            if name == "jobs" and not existing and linkedin_job_id(merged.get("postingUrl")):
+                jid = linkedin_job_id(merged["postingUrl"])
+                dup = next((j for j in doc["records"] if linkedin_job_id(j.get("postingUrl")) == jid), None)
+                if dup:  # the same LinkedIn post pasted twice
+                    print(json.dumps({"skipped_duplicate": f"linkedin_job:{jid}", "existingId": dup["id"]}))
+                    continue
             doc["records"] = [r for r in doc["records"] if r["id"] != merged["id"]] + [merged]
             errs = record_errors(name, merged, docs, prefs)
             if errs:
@@ -539,6 +594,53 @@ def compute_followups(docs, prefs):
     return out
 
 
+JOB_URL_CODES = {
+    "f_TPR": ("job_date_posted", {"past_24h": "r86400", "past_week": "r604800", "past_month": "r2592000"}),
+    "f_WT": ("job_workplace", {"onsite": "1", "remote": "2", "hybrid": "3"}),
+    "f_E": ("job_experience", {"internship": "1", "entry": "2", "associate": "3", "mid_senior": "4",
+                               "director": "5", "executive": "6"}),
+}
+
+
+def linkedin_jobs_url(keywords, location, prefs):
+    """A LinkedIn Jobs search link the STUDENT opens; Claude never loads or reads the results page."""
+    from urllib.parse import urlencode
+    q = {"keywords": keywords}
+    if location:
+        q["location"] = location
+    for param, (key, codes) in JOB_URL_CODES.items():
+        code = codes.get(prefs.get(key, "any"))
+        if code:
+            q[param] = code
+    q["sortBy"] = "DD"
+    return "https://www.linkedin.com/jobs/search/?" + urlencode(q)
+
+
+def compute_pipeline(docs, prefs, today):
+    wd = prefs.get("working_days", DAY_NAMES[:5])
+    tz, _ = get_tz(prefs.get("timezone", "UTC"))
+    n_job = prefs.get("job_follow_up_business_days", 7)
+    job_fu = []
+    for j in docs["jobs"]["records"]:
+        applied = parse_time(j.get("appliedAt"))
+        if j["stage"] == "applied" and applied and not j.get("lastFollowUpAt"):
+            due = add_business_days(applied.astimezone(tz).date(), n_job, wd)
+            if due <= today:
+                job_fu.append({"jobId": j["id"], "title": j["title"], "company": j["company"], "due": due.isoformat()})
+    deals_due = [{"dealId": d["id"], "prospectId": d["prospectId"], "stage": d["stage"], "nextStep": d["nextStep"],
+                  "due": d.get("nextStepDue")} for d in docs["deals"]["records"]
+                 if d["stage"] not in ("won", "lost", "paused") and d.get("nextStepDue")
+                 and dt.date.fromisoformat(d["nextStepDue"][:10]) <= today]
+    week_start = today - dt.timedelta(days=today.weekday())
+    applied_week = sum(1 for j in docs["jobs"]["records"] if parse_time(j.get("appliedAt"))
+                       and parse_time(j["appliedAt"]).astimezone(tz).date() >= week_start)
+    count = lambda recs, f: {s: sum(1 for r in recs if r["stage"] == s) for s in f if any(r["stage"] == s for r in recs)}
+    return {"jobFollowups": job_fu, "dealsDue": deals_due,
+            "jobPipeline": count(docs["jobs"]["records"], JOB_STAGES),
+            "dealPipeline": count(docs["deals"]["records"], DEAL_STAGES),
+            "applicationsThisWeek": applied_week, "applicationsTarget": prefs.get("applications_per_week")}
+
+
 def compute_status(minutes=None):
     prefs, pref_issues = load_prefs()
     docs = load_all()
@@ -603,6 +705,7 @@ def compute_status(minutes=None):
         "blocked": [{"id": t["id"], "reason": t.get("blockedReason")} for t in open_tasks if t["status"] == "blocked"],
         "pendingDecisions": [r["id"] for r in proposed],
         "followups": compute_followups(docs, prefs),
+        **compute_pipeline(docs, prefs, today),
         "staleResearch": stale,
         "tasksNeedingFeaturePause": paused_by_feature,
         "pausedTasksToReassess": reassess,
@@ -722,7 +825,9 @@ def render_dashboard():
     sections = {
         "Today": f"""<div class="next"><span>Next action</span><strong>{e(st['nextAction'])}</strong></div>
 {today_cards}
-<h3>Follow-ups</h3>{table(st['followups'], [('Prospect', lambda r: e(r['name'])), ('Action', lambda r: e(r['action'])), ('Due / reason', lambda r: e(r.get('due') or r.get('reason')))], 'No follow-ups due.')}""",
+<h3>Follow-ups</h3>{table(st['followups'], [('Prospect', lambda r: e(r['name'])), ('Action', lambda r: e(r['action'])), ('Due / reason', lambda r: e(r.get('due') or r.get('reason')))], 'No follow-ups due.')}
+<h3>Applications to follow up</h3>{table(st['jobFollowups'], [('Role', lambda r: e(r['title'])), ('Company', lambda r: e(r['company'])), ('Due', lambda r: e(r['due']))], 'None due.')}
+<h3>Deal next steps due</h3>{table(st['dealsDue'], [('Buyer', lambda r: pname(r['prospectId'])), ('Stage', lambda r: e(r['stage'])), ('Next step', lambda r: e(r['nextStep'])), ('Due', lambda r: e(r['due']))], 'None due.')}""",
         "Recommendations": table(sorted(R["recommendations"], key=lambda r: (r.get("researchVersion", ""), r["rank"])),
             [("Rank", lambda r: e(r["rank"])), ("Option", lambda r: e(r["option"])), ("Fit", lambda r: e(r.get("fit"))),
              ("Gaps", lambda r: e(r.get("gaps"))), ("Confidence", lambda r: e(r.get("confidence"))),
@@ -751,6 +856,21 @@ def render_dashboard():
             ("State", lambda r: e(r["schedulingState"])), ("Notes", lambda r: e(r["notesProvenance"])),
             ("Findings", lambda r: e(r.get("findings"))), ("Commitments", lambda r: e(r.get("commitments")))],
             "Validation interviews not started." + (" (feature off)" if prefs.get("validation_interviews") == "off" else "")),
+        "Jobs": f"""<p class="muted">Applications this week: {e(st['applicationsThisWeek'])} of {e(st['applicationsTarget'])} planned.
+Pipeline: {e(', '.join(f'{k} {v}' for k, v in st['jobPipeline'].items()) or 'empty')}</p>""" +
+            table(sorted(R["jobs"], key=lambda r: (JOB_STAGES.index(r["stage"]), -r["fitScore"])),
+            [("Role", lambda r: e(r["title"])), ("Company", lambda r: e(r["company"])), ("Fit", lambda r: e(r["fitScore"])),
+             ("Why / gaps", lambda r: e(r["fitReason"]) + (f"<br><span class='muted'>Gaps: {e(r.get('gaps'))}</span>" if r.get("gaps") else "")),
+             ("Stage", lambda r: e(r["stage"])), ("Applied", lambda r: e(r.get("appliedAt"))),
+             ("Post", lambda r: f'<a href="{html.escape(r["postingUrl"])}" target="_blank" rel="noopener noreferrer">Open</a>'
+              if linkedin_job_id(r.get("postingUrl")) else e(None))],
+            "No job posts yet. Ask Claude for today's LinkedIn job search links, then paste the posts you like."),
+        "Sales": f"""<p class="muted">Pipeline: {e(', '.join(f'{k} {v}' for k, v in st['dealPipeline'].items()) or 'empty')}</p>""" +
+            table(sorted(R["deals"], key=lambda r: (DEAL_STAGES.index(r["stage"]), r.get("nextStepDue") or "")),
+            [("Buyer", lambda r: pname(r["prospectId"])), ("Offer", lambda r: e(r["offer"])), ("Stage", lambda r: e(r["stage"])),
+             ("Next step", lambda r: e(r["nextStep"])), ("Due", lambda r: e(r.get("nextStepDue"))),
+             ("Value", lambda r: e(r.get("value")))],
+            "No deals yet. Deals start when a conversation shows a real need."),
         "Opportunities": table(R["opportunities"], [("Type", lambda r: e(r["type"])), ("Contact", lambda r: pname(r.get("prospectId"))),
             ("Org", lambda r: e(r.get("organization"))), ("Stage", lambda r: e(r["stage"])),
             ("Next", lambda r: e(r.get("nextAction"))), ("Outcome", lambda r: e(r["outcome"]))]),
@@ -825,6 +945,7 @@ def main():
     u.add_argument("--expect-revision", type=int); u.add_argument("--actor", default="ai", choices=["ai", "user"])
     s = sub.add_parser("status"); s.add_argument("--minutes", type=int)
     sub.add_parser("followups")
+    ju = sub.add_parser("jobs-url"); ju.add_argument("--keywords", required=True); ju.add_argument("--location", default="")
     sub.add_parser("apply-features")
     r = sub.add_parser("run"); r.add_argument("action", choices=["start", "finish", "fail", "skip"])
     r.add_argument("--job", required=True); r.add_argument("--key"); r.add_argument("--note")
@@ -869,6 +990,10 @@ def main():
         upsert(a.file, json.loads(raw), a.expect_revision, a.actor)
     elif a.cmd == "status":
         print(json.dumps(compute_status(a.minutes), indent=2, ensure_ascii=False))
+    elif a.cmd == "jobs-url":
+        prefs, _ = load_prefs()
+        print(json.dumps({"url": linkedin_jobs_url(a.keywords, a.location, prefs),
+                          "note": "Give this link to the student to open. Do not load or read it yourself."}))
     elif a.cmd == "followups":
         prefs, _ = load_prefs()
         print(json.dumps(compute_followups(load_all(), prefs), indent=2, ensure_ascii=False))

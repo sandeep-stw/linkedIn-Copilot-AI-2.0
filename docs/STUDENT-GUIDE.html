@@ -1,0 +1,368 @@
+<title>LinkedIn Copilot Student Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: reading column (~68ch) with a sticky contents rail on wide screens; ownership chips mark who acts. */
+:root {
+  --bg: #f4f6f3;
+  --surface: #ffffff;
+  --ink: #1b2420;
+  --muted: #5b6862;
+  --line: #d9e0dc;
+  --accent: #0e6b61;        /* Claude's work */
+  --accent-soft: #e1f0ed;
+  --you: #a8650c;           /* the student's own action */
+  --you-soft: #fbefd9;
+  --ok: #2f7a3e;
+  --stop: #b23a32;
+  --code-bg: #eaefec;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, "Cascadia Mono", monospace;
+  --step--1: 0.875rem; --step-0: 1.0625rem; --step-1: 1.25rem; --step-2: 1.6rem; --step-3: clamp(2rem, 5vw, 2.9rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715; --surface: #18201d; --ink: #e5ece8; --muted: #9db0a7; --line: #2b3732;
+    --accent: #5cc3b5; --accent-soft: #173430; --you: #f0b65a; --you-soft: #3a2b12;
+    --ok: #6fca7f; --stop: #f08a80; --code-bg: #1f2925; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715; --surface: #18201d; --ink: #e5ece8; --muted: #9db0a7; --line: #2b3732;
+  --accent: #5cc3b5; --accent-soft: #173430; --you: #f0b65a; --you-soft: #3a2b12;
+  --ok: #6fca7f; --stop: #f08a80; --code-bg: #1f2925; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--step-0)/1.6 var(--font-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 32px 64px;
+  display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; }
+@media (max-width: 860px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-inline: 16px; } }
+
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start;
+  font-size: var(--step--1); display: grid; gap: 4px; }
+nav.toc .label { text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+nav.toc a { color: var(--muted); text-decoration: none; padding: 4px 10px; border-left: 2px solid var(--line); display: flex; gap: 8px; }
+nav.toc .n { font: 700 var(--step--1) var(--font-mono); color: var(--accent); font-variant-numeric: tabular-nums; min-width: 1ch; }
+nav.toc .ref { margin-top: 14px; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--ink); border-left-color: var(--accent); outline: none; }
+@media (max-width: 860px) {
+  nav.toc { position: static; display: flex; flex-wrap: wrap; gap: 6px; }
+  nav.toc .label { width: 100%; margin: 0; }
+  nav.toc a { border: 1px solid var(--line); border-radius: 99px; padding: 3px 12px; background: var(--surface); }
+}
+
+main { min-width: 0; display: grid; gap: 56px; }
+main section { display: grid; gap: 12px; max-width: 68ch; scroll-margin-top: 24px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: var(--step-3); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: var(--step-2); font-weight: 800; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+p { margin: 0; }
+.eyebrow { font-size: var(--step--1); text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 700; }
+.lede { font-size: var(--step-1); color: var(--muted); max-width: 56ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: var(--step--1); color: var(--muted); }
+.facts b { color: var(--ink); font-variant-numeric: tabular-nums; }
+header.hero { display: grid; gap: 14px; max-width: 72ch; }
+
+code, .cmd { font-family: var(--font-mono); font-size: .9em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.cmdrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.cmdrow .cmd { flex: 1 1 14ch; min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+button.copy { font: 700 var(--step--1) var(--font-body); color: var(--accent); background: var(--accent-soft);
+  border: 0; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 4px 12px; }
+ol.steps > li::before { content: counter(s); grid-row: span 2; font: 800 var(--step-1)/1 var(--font-display);
+  color: var(--accent); padding-top: 3px; font-variant-numeric: tabular-nums; }
+ol.steps > li > div { min-width: 0; display: grid; gap: 6px; }
+
+.who { display: inline-block; font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  border-radius: 99px; padding: 1px 9px; vertical-align: 2px; margin-right: 6px; }
+.who.ai { color: var(--accent); background: var(--accent-soft); }
+.who.you { color: var(--you); background: var(--you-soft); }
+
+.loop { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .loop { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.loop div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 6px; align-content: start; }
+.loop .t { font-family: var(--font-display); font-weight: 600; }
+.loop p { font-size: var(--step--1); color: var(--muted); }
+
+.task { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; }
+.task .top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; }
+.task .pri { font: 700 .75rem var(--font-mono); background: var(--accent); color: var(--surface); border-radius: 4px; padding: 1px 6px; }
+.task .meta { color: var(--muted); font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+.task pre { margin: 0; white-space: pre-wrap; font: 500 .85rem/1.55 var(--font-mono); background: var(--code-bg); border-radius: 8px; padding: 10px 12px; }
+.example { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+.tracks { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .tracks { grid-template-columns: minmax(0, 1fr); } }
+.track { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.track ol.steps { gap: 10px; }
+.track ol.steps > li::before { font-size: var(--step-0); }
+.track p { font-size: var(--step--1); }
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+th, td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: .75rem; }
+td:first-child { white-space: nowrap; }
+
+.rules { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 640px) { .rules { grid-template-columns: minmax(0, 1fr); } }
+.rules ul { margin: 0; padding: 14px 16px 14px 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 8px; }
+.rules h3 { font-size: var(--step-0); margin-bottom: 6px; }
+.rules .do h3 { color: var(--ok); }
+.rules .dont h3 { color: var(--stop); }
+.note { border-left: 3px solid var(--you); background: var(--you-soft); padding: 12px 14px; border-radius: 0 8px 8px 0; }
+
+.phrases { display: flex; flex-wrap: wrap; gap: 8px; }
+.phrases button { font: 400 var(--step--1) var(--font-body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.phrases button:hover, .phrases button:focus-visible { border-color: var(--accent); outline: none; }
+
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 14px; }
+details + details { margin-top: 8px; }
+summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details p { padding-bottom: 12px; color: var(--muted); }
+footer { color: var(--muted); font-size: var(--step--1); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 99px; font-size: var(--step--1); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <span class="label">Your path</span>
+    <a href="#start"><span class="n">1</span>Start</a>
+    <a href="#first-run"><span class="n">2</span>First run</a>
+    <a href="#daily"><span class="n">3</span>Every day</a>
+    <a href="#jobs-sales"><span class="n">4</span>Jobs &amp; selling</a>
+    <a href="#replies"><span class="n">5</span>Replies</a>
+    <a href="#schedule"><span class="n">6</span>Weekly &amp; monthly</a>
+    <a href="#settings"><span class="n">7</span>Settings</a>
+    <span class="label ref">Reference</span>
+    <a href="#commands">Commands</a>
+    <a href="#rules">Account safety</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <span class="eyebrow">Student guide</span>
+      <h1>Your LinkedIn Copilot, step by step</h1>
+      <p class="lede">Follow the seven steps in order. Claude researches, drafts and keeps track; you read, paste and click in LinkedIn.</p>
+      <div class="facts"><span>Setup <b>10 min</b></span><span>Daily <b>about 15 min</b></span><span>Needs <b>Python 3.9+</b></span></div>
+    </header>
+
+    <section id="start">
+      <span class="eyebrow">Step 1 of 7</span>
+      <h2>Install and open</h2>
+      <ol class="steps">
+        <li><div><h3>Unzip and move the kit folder</h3>
+          <p>Put it somewhere permanent, such as <code>Documents</code>. This folder becomes your personal campaign: your settings and progress are saved inside it.</p></div></li>
+        <li><div><h3>Open the folder in Claude</h3>
+          <p>Claude desktop app → <b>Code</b> tab → choose the kit folder. Using the terminal instead? Open it in the folder and run <code>claude</code>.</p></div></li>
+        <li><div><h3>Type the start command</h3>
+          <div class="cmdrow"><span class="cmd">/linkedin-copilot</span><button class="copy" type="button" data-copy="/linkedin-copilot">Copy</button></div></div></li>
+      </ol>
+      <p class="note">Python missing? Install it from python.org and tick <b>Add to PATH</b> during setup, then restart Claude. Check with <code>python --version</code>.</p>
+    </section>
+
+    <section id="first-run">
+      <span class="eyebrow">Step 2 of 7</span>
+      <h2>Set up your campaign</h2>
+      <ol class="steps">
+        <li><div><p><span class="who ai">Claude</span>asks which sources you have. Give as many as you can; more sources mean better options.</p>
+          <div class="tw"><table>
+            <thead><tr><th>Source</th><th>How you share it</th></tr></thead>
+            <tbody>
+              <tr><td>Upwork profile</td><td>Claude reads it through the Upwork connector. Read only, nothing changes on Upwork.</td></tr>
+              <tr><td>Résumé PDF</td><td>Give the file path, for example <code>C:\Users\...\Documents\Resume.pdf</code></td></tr>
+              <tr><td>LinkedIn profile</td><td>Easiest: on your profile choose <b>Resources → Save to PDF</b> and give that file. Or sign in yourself in Claude's browser pane and Claude reads your own profile once.</td></tr>
+            </tbody>
+          </table></div></div></li>
+        <li><div><p><span class="who ai">Claude</span>researches and shows <b>3 ranked options</b> (roles, or services if you sell), each with evidence, fit, gaps and confidence.</p></div></li>
+        <li><div><p><span class="who you">You</span>pick one. You can also ask to compare them, see the evidence, or research another direction.</p></div></li>
+        <li><div><p><span class="who ai">Claude</span>sets up your campaign: profile improvements, the first post drafts and a first list of about 30 people.</p></div></li>
+        <li><div><p><span class="who you">You</span>say yes to the daily, weekly and monthly schedule. Then open <b>Scheduled</b> in the sidebar and click <b>Run now</b> once on each task, so later runs don't stop to ask for permission.</p></div></li>
+      </ol>
+      <p class="note"><b>Never type a password into the chat.</b> If you use the browser pane, you sign in yourself. Claude never sees or stores passwords.</p>
+    </section>
+
+    <section id="daily">
+      <span class="eyebrow">Step 3 of 7</span>
+      <h2>Work your daily tasks</h2>
+      <p>At 08:30 on working days the copilot prepares drafts for you while the Claude app is open. Then each task follows the same loop:</p>
+      <div class="loop">
+        <div><span class="who ai">Claude</span><span class="t">Prepares</span><p>Shows what to do, why, and a ready draft.</p></div>
+        <div><span class="who ai">Claude</span><span class="t">Opens</span><p>Opens the one LinkedIn page this task needs.</p></div>
+        <div><span class="who you">You</span><span class="t">Act</span><p>Read, paste, adjust and click Connect, Send or Post.</p></div>
+        <div><span class="who you">You</span><span class="t">Confirm</span><p>Type <code>done</code>, or <code>skip</code> if it doesn't feel right.</p></div>
+      </div>
+      <div class="task" aria-label="Example task">
+        <span class="example">Example task</span>
+        <div class="top"><span class="pri">P2</span><h3>Connection note to a platform engineering lead</h3><span class="meta">~3 min · prepared</span></div>
+        <p><b>Why:</b> leads the team behind the role you chose and posted about hiring last week.</p>
+        <pre>Hi Asha, I read your post about scaling your platform team. I've spent four years building internal developer platforms and would value following your work. Thanks!</pre>
+        <p class="meta">After sending in LinkedIn, type <code>done</code>. Claude records it and moves to the next task.</p>
+      </div>
+      <p>Only have a few minutes? Say <b>"I have 5 minutes"</b> and you get the single most valuable task.</p>
+    </section>
+
+    <section id="jobs-sales">
+      <span class="eyebrow">Step 4 of 7</span>
+      <h2>Find jobs or win clients</h2>
+      <p>Your goal decides which track you follow. <b>Career mode</b> finds and wins jobs from LinkedIn job posts. <b>Business mode</b> turns conversations into paying clients. Claude sets the mode from the option you picked in Step 2.</p>
+      <div class="tracks">
+        <div class="track">
+          <h3>Career mode: land a job</h3>
+          <ol class="steps">
+            <li><div><p><span class="who ai">Claude</span>prepares LinkedIn Jobs search links each day, filtered to your role, location and recent posts.</p></div></li>
+            <li><div><p><span class="who you">You</span>open the links and paste 2 to 5 posts that look right (the link plus the job description).</p></div></li>
+            <li><div><p><span class="who ai">Claude</span>scores each post from 0 to 100 against your real experience and names the gaps.</p></div></li>
+            <li><div><p><span class="who ai">Claude</span>tailors your r&eacute;sum&eacute; bullets and a short cover note, and finds people at that company who could refer you.</p></div></li>
+            <li><div><p><span class="who you">You</span>apply on LinkedIn or the company site, then type <b>applied</b>.</p></div></li>
+            <li><div><p><span class="who ai">Claude</span>drafts a follow-up after 7 working days and prepares you when an interview comes.</p></div></li>
+          </ol>
+        </div>
+        <div class="track">
+          <h3>Business mode: win clients</h3>
+          <ol class="steps">
+            <li><div><p><span class="who ai">Claude</span>builds your pitch kit: one-line value statement, 30-second pitch, one-page offer, price options and answers to common objections.</p></div></li>
+            <li><div><p><span class="who you">You</span>approve it. Price options stay labelled as guesses until someone pays.</p></div></li>
+            <li><div><p><span class="who ai">Claude</span>spots real needs in your conversations and opens a deal with a dated next step.</p></div></li>
+            <li><div><p><span class="who ai">Claude</span>drafts each step: a discovery call invite and questions, then a proposal in the buyer's own words.</p></div></li>
+            <li><div><p><span class="who you">You</span>send it and type <b>sent</b>. Claude follows up and helps with objections.</p></div></li>
+            <li><div><p><span class="who you">You</span>tell Claude when a deal is won or lost.</p></div></li>
+          </ol>
+        </div>
+      </div>
+      <p class="note">No cold pitching: Claude never pitches in a first message. Selling starts after a conversation shows a real need, which keeps your messages welcome and your account safe.</p>
+    </section>
+
+    <section id="replies">
+      <span class="eyebrow">Step 5 of 7</span>
+      <h2>Handle replies</h2>
+      <ol class="steps">
+        <li><div><p><span class="who you">You</span>type <b>"I got a reply"</b> and paste the message.</p></div></li>
+        <li><div><p><span class="who ai">Claude</span>pauses follow-ups for that person and drafts your answer.</p></div></li>
+      </ol>
+      <p>If someone says no or asks you to stop, paste it too. Claude marks them <b>do not contact</b> and cancels every planned message to them, permanently. Only you can undo that.</p>
+      <p>No reply? Claude suggests a first follow-up after 5 working days and a second after 7 more, then stops.</p>
+    </section>
+
+    <section id="schedule">
+      <span class="eyebrow">Step 6 of 7</span>
+      <h2>Review weekly and monthly</h2>
+      <div class="tw"><table>
+        <thead><tr><th>When</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>Mon–Fri 08:30</td><td>Follow-ups, job search links or deal next steps, next messages, post drafts and today's plan are prepared.</td></tr>
+          <tr><td>Friday 17:00</td><td>Weekly review: results, the main bottleneck, your job search or sales pipeline, new people to contact, next week's posts.</td></tr>
+          <tr><td>1st of month</td><td>Re-reads your Upwork profile, refreshes research, re-checks your profile and reviews the month.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Scheduled runs only prepare work. They never open LinkedIn or send anything. A big change, such as a new direction, is always offered as options for you to choose.</p>
+    </section>
+
+    <section id="settings">
+      <span class="eyebrow">Step 7 of 7</span>
+      <h2>Adjust settings</h2>
+      <p>Tell Claude what you want. Click a phrase to copy it:</p>
+      <div class="phrases">
+        <button type="button" data-copy="Give me 20 minutes a day">Give me 20 minutes a day</button>
+        <button type="button" data-copy="Only 2 posts a week">Only 2 posts a week</button>
+        <button type="button" data-copy="Turn off follow-up drafts">Turn off follow-up drafts</button>
+        <button type="button" data-copy="Switch to business mode">Switch to business mode</button>
+        <button type="button" data-copy="Only remote jobs">Only remote jobs</button>
+        <button type="button" data-copy="Show jobs posted in the last 24 hours">Jobs from the last 24 hours</button>
+        <button type="button" data-copy="Aim for 10 applications a week">10 applications a week</button>
+        <button type="button" data-copy="Stop the daily preparation">Stop the daily preparation</button>
+      </div>
+      <p>Your settings live in <code>linkedin-copilot/settings/PREFERENCES.md</code>. Your dashboard is <code>linkedin-copilot/dashboard/index.html</code>: open it in a browser to see today's tasks, your people, conversations, posts and progress.</p>
+    </section>
+
+    <section id="commands">
+      <h2>Commands you'll use</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Type</th><th>When</th></tr></thead>
+        <tbody>
+          <tr><td><code>/linkedin-copilot</code></td><td>Start. First time it sets you up; after that it runs today's session.</td></tr>
+          <tr><td><code>done</code> · <code>skip</code></td><td>After each task.</td></tr>
+          <tr><td>I got a reply</td><td>Someone answered. Paste their message.</td></tr>
+          <tr><td>find jobs</td><td>Get today's LinkedIn job search links.</td></tr>
+          <tr><td>(paste a job post)</td><td>Score it and prepare your application.</td></tr>
+          <tr><td>applied &middot; I have an interview</td><td>Update the job and get interview prep.</td></tr>
+          <tr><td>write a proposal for &hellip;</td><td>Business mode: a proposal for that buyer.</td></tr>
+          <tr><td>they said it's too expensive</td><td>An honest answer to the objection.</td></tr>
+          <tr><td><code>/linkedin-copilot review</code></td><td>How is it going? Results and what to change.</td></tr>
+          <tr><td><code>/li-profile-optimization</code></td><td>Improve your LinkedIn profile again.</td></tr>
+          <tr><td><code>/li-prospect-research</code></td><td>Find more people to connect with.</td></tr>
+          <tr><td><code>/li-content-research</code></td><td>Get a post draft now.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="rules">
+      <h2>Keep your LinkedIn account safe</h2>
+      <p>LinkedIn bans bots and automation that send, connect, post or collect data, even inside your own browser. The copilot is built so that <b>you</b> do every action on LinkedIn. That is what protects your account.</p>
+      <div class="rules">
+        <div class="do"><h3>Do</h3><ul>
+          <li>Read every draft and adjust it to your voice.</li>
+          <li>Confirm only things that are true about you.</li>
+          <li>Send a few thoughtful messages a day.</li>
+          <li>Tell Claude when someone says no.</li>
+        </ul></div>
+        <div class="dont"><h3>Don't</h3><ul>
+          <li>Ask Claude to click Send, Connect or Post for you.</li>
+          <li>Let a draft claim results you didn't achieve.</li>
+          <li>Mass-send or install LinkedIn automation extensions.</li>
+          <li>Contact people again after they declined.</li>
+        </ul></div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ and fixes</h2>
+      <div>
+        <details><summary>"python is not recognized"</summary><p>Install Python from python.org, tick Add to PATH, then restart Claude.</p></details>
+        <details><summary>The 08:30 preparation didn't run</summary><p>Scheduled runs need the Claude app open. A missed run happens the next time you open it.</p></details>
+        <details><summary>Upwork import failed</summary><p>Add the Upwork connector in Claude, or paste your Upwork profile text into the chat instead.</p></details>
+        <details><summary>Something looks wrong in my data</summary><p>Say "check my copilot data". Backups are kept automatically in <code>linkedin-copilot/data/.backups/</code>.</p></details>
+        <details><summary>How do I update to a new kit version?</summary><p>Unzip the new kit anywhere. Then, in your current campaign folder, tell Claude "Update my copilot from" followed by the new kit's folder path. Your settings and data are kept.</p></details>
+        <details><summary>Is my data shared?</summary><p>No. Everything stays on your computer in the <code>linkedin-copilot</code> folder. No passwords or cookies are stored. Don't share your <code>data</code> folder.</p></details>
+      </div>
+    </section>
+
+    <footer>LinkedIn Copilot Student Kit. Claude prepares, you decide and act.</footer>
+  </main>
+</div>
+<div class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  var toast = document.querySelector('.toast'), timer;
+  function show(msg) {
+    toast.textContent = msg; toast.hidden = false;
+    clearTimeout(timer); timer = setTimeout(function () { toast.hidden = true; }, 1800);
+  }
+  function selectText(el) {
+    try { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {}
+  }
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      var target = btn.previousElementSibling && btn.classList.contains('copy') ? btn.previousElementSibling : btn;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { show('Copied: ' + text); },
+          function () { selectText(target); show('Selected. Press Ctrl+C to copy'); });
+      } else { selectText(target); show('Selected. Press Ctrl+C to copy'); }
+    });
+  });
+})();
+</script>

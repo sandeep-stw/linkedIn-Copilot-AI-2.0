@@ -32,20 +32,36 @@ Someone said no? Paste it — Claude stops all contact with that person, permane
 
 Only 5 minutes today? Say **"I have 5 minutes"** — you get the single most valuable task.
 
-## 3. Weekly and monthly (automatic)
+## 3. Find jobs or win clients
+
+**Career mode (LinkedIn job posts only)**
+1. Claude prepares LinkedIn Jobs search links each day (your role, location, recent posts).
+2. You open them and paste 2–5 posts that look right (link + job description).
+3. Claude scores each post 0–100 against your real experience and names the gaps.
+4. Claude tailors your résumé bullets and a short cover note, and finds people who could refer you.
+5. You apply (Easy Apply or company site) and type **applied**.
+6. Claude drafts a follow-up after 7 working days and prepares you for interviews.
+
+**Business mode**
+1. Claude builds your pitch kit: value statement, 30-second pitch, one-page offer, price options, objection answers.
+2. Conversations that show a real need become deals with a dated next step.
+3. Claude drafts the discovery invite, questions and the proposal; you send it and type **sent**.
+4. You tell Claude when a deal is won or lost. No pitching in first messages.
+
+## 4. Weekly and monthly (automatic)
 - **Friday 17:00** — weekly review: what worked, the bottleneck, new people, next week's posts.
 - **1st of the month** — re-reads your Upwork profile, refreshes research, re-checks your profile.
 Big changes (a new direction) are always offered as options. **You decide.**
 
-## 4. Settings — just say it
+## 5. Settings — just say it
 "Give me 20 minutes a day" · "Only 2 posts a week" · "Turn off follow-up drafts" ·
-"Switch to business mode". Claude updates `linkedin-copilot/settings/PREFERENCES.md`.
+"Switch to business mode" · "Only remote jobs" · "Aim for 10 applications a week". Claude updates `linkedin-copilot/settings/PREFERENCES.md`.
 
-## 5. Your dashboard
+## 6. Your dashboard
 Open `linkedin-copilot/dashboard/index.html` in your browser: today's tasks with copy buttons,
 your prospects, conversations, posts, opportunities and progress. It refreshes after every session.
 
-## 6. Do's and don'ts (protect your LinkedIn account)
+## 7. Do's and don'ts (protect your LinkedIn account)
 
 | ✅ Do | ❌ Don't |
 | --- | --- |
@@ -57,7 +73,7 @@ your prospects, conversations, posts, opportunities and progress. It refreshes a
 LinkedIn bans bots and automation, even in your own browser. The copilot is designed so that **you**
 do every action on LinkedIn — that is what keeps your account safe.
 
-## 7. FAQ / troubleshooting
+## 8. FAQ / troubleshooting
 - **"python is not recognized"** → install Python from python.org (tick *Add to PATH*), restart Claude.
 - **Scheduled run didn't happen** → the Claude app must be open; missed runs run when you reopen it.
 - **Upwork import failed** → add the Upwork connector, or paste your Upwork profile text instead.
